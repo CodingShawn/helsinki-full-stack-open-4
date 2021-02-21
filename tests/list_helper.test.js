@@ -113,7 +113,7 @@ describe("favoriteBlog", () => {
 });
 
 describe('mostBlogs', () => {
-  test("When given 1 blog, return that blog", () => {
+  test("When given 1 blog, return that author", () => {
     const result = listHelper.mostBlogs(listWithOneBlog);
     expect(result).toEqual({
       author: "Edsger W. Dijkstra",
@@ -126,6 +126,24 @@ describe('mostBlogs', () => {
     expect(result).toEqual({
       author: "Robert C. Martin",
       blogs: 3
+    })
+  })
+})
+
+describe("mostLikes", () => {
+  test("When given 1 blog, return that author", () => {
+    const result = listHelper.mostLikes(listWithOneBlog);
+    expect(result).toEqual({
+      author: "Edsger W. Dijkstra",
+      likes: 5
+    })
+  })
+
+  test("When given a list of blogs, return author that has most likes", () => {
+    const result = listHelper.mostLikes(blogs);
+    expect(result).toEqual({
+      author: "Edsger W. Dijkstra",
+      likes: 17
     })
   })
 })

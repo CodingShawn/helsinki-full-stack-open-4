@@ -35,10 +35,30 @@ function mostBlogs(blogs) {
     result.push(author);
     return result;
   }, [])
-  
+
   return _.maxBy(authorsBlogCountList, function(author) {
     return author.blogs;
   })
 }
 
-module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs };
+function mostLikes(blogs) {
+  let authorsBlogList = _.groupBy(blogs, function(blog){
+    return blog.author
+  })
+  let authorsLikesCountList = _.reduce(authorsBlogList, function(result, value, key) {
+    let author = {
+      author: key,
+      likes: authorsBlogList[key].reduce( (accLikes, blog) => {
+        return accLikes + blog.likes
+      }, 0)
+    }
+    result.push(author);
+    return result;
+  }, [])
+
+  return _.maxBy(authorsLikesCountList, function(author) {
+    return author.likes
+  })
+}
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes };
