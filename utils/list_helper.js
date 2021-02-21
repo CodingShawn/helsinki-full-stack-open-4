@@ -11,4 +11,12 @@ function totalLikes(blogs) {
   return likes;
 }
 
-module.exports = { dummy, totalLikes };
+function favoriteBlog(blogs) {
+  let favoriteBlog = blogs.reduce((favorite, blog) => {
+    if (favorite == undefined) return blog;
+    return favorite.likes < blog.likes ? blog : favorite;
+  });
+  return favoriteBlog;
+}
+
+module.exports = { dummy, totalLikes, favoriteBlog };
