@@ -61,6 +61,17 @@ test("Blog content saved after POST request is correct", async () => {
   expect(response.body[response.body.length - 1].title).toBe("Type wars");
 });
 
+test("If likes property missing from request, likes will default to 0", async () => {
+  let newBlog = {
+    title: "You don't know JS",
+    author: "Kyle Simpson",
+    url: "https://github.com/getify/You-Dont-Know-JS"
+  }
+
+  let response = await api.post("/api/blogs").send(newBlog);
+  expect(response.body.likes).toBe(0);
+})
+
 afterAll(() => {
   mongoose.connection.close();
 });
