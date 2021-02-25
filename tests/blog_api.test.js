@@ -96,6 +96,21 @@ test("If url missing from request, will respond with status code 400", async () 
     .expect(400)
 })
 
+test("Able to delete post", async () => {
+  const responseAtStart = await api.get("/api/blogs");
+  let blogToDelete = responseAtStart.body[0];
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const responseAtEnd = await api.get("/api/blogs");
+
+  let content = responseAtEnd.body.map(blog => blog.title);
+
+  expect(content).not.toContain(blogToDelete.content)
+})
+
 afterAll(() => {
   mongoose.connection.close();
 });
