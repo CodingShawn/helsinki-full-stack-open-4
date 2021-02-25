@@ -72,6 +72,30 @@ test("If likes property missing from request, likes will default to 0", async ()
   expect(response.body.likes).toBe(0);
 })
 
+test("If title missing from request, will respond with status code 400", async () => {
+  let newBlog = {
+    author: "Missing title author",
+    url: "www.missingtitle.com",
+    likes: 0
+  }
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(400)
+})
+
+test("If url missing from request, will respond with status code 400", async () => {
+  let newBlog = {
+    title: "Missing URL",
+    author: "Missing url author",
+    likes: 0
+  }
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(400)
+})
+
 afterAll(() => {
   mongoose.connection.close();
 });
