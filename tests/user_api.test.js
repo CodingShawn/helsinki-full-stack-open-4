@@ -23,6 +23,23 @@ test('User will not be created if password is less than 3 characters', async () 
   expect(response.body).toStrictEqual({error: 'Password must be at least 3 characters long'})
 })
 
+test('User will not be created if username is less than 3 characters', async () => {
+  let user = {
+    "username": "a",
+    "name:": "usershort",
+    "password" : "123"
+  }
+
+  let response = await api
+    .post('/api/users')
+    .send(user)
+    .expect(400)
+
+  console.log(response.body);
+
+  expect(response.body).toStrictEqual({ error: "Inappropriate data" })
+})
+
 afterAll(() => {
   mongoose.connection.close();
 });
