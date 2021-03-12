@@ -22,7 +22,7 @@ blogsRouter.post("/", async (request, response, next) => {
       return response.status(401).json({ error: "token missing or invalid" });
     }
     const user = await User.findById(decodedToken.id);
-    
+
     const blog = new Blog({
       title: body.title,
       author: body.author,
@@ -42,8 +42,18 @@ blogsRouter.post("/", async (request, response, next) => {
 });
 
 blogsRouter.delete("/:id", async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id);
-  response.status(204).end();
+  const returnedBlog = await Blog.findById(request.params.id);
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  if (!request.token || !decodedToken.id) {
+    return response.status(401).json({ error: "token missing or invalid" });
+  }
+  const user = await User.findById(decodedToken.id);
+  if (returnedBlog.user.toString() === user.id.toString()) {
+    await Blog.findByIdAndDelete(request.params.id);
+    response.status(204).end();
+  } else {
+    return response.status(401).json({ error: "You do not have permission to delete this" });
+  }
 });
 
 blogsRouter.put("/:id", async (request, response) => {
