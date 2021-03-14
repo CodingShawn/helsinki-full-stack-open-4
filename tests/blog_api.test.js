@@ -6,6 +6,27 @@ const initialBlogs = require("./test_helper");
 
 const api = supertest(app);
 
+beforeAll(async () => {
+  let newUser = {
+    username: "testuser",
+    name: "pwd",
+    password : "pwd123"
+}
+
+await api
+    .post("/api/users")
+    .send(newUser)
+
+  let loginDetails = {
+    username: "testuser",
+    password: "pwd123"
+}
+  let loginResponse = await api
+                .post("/api/login")
+                .send(loginDetails)
+  let token = loginResponse.body.token;
+})
+
 beforeEach(async () => {
   await Blog.deleteMany({});
   let blogObject = new Blog(initialBlogs[0]);
