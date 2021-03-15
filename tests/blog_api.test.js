@@ -147,6 +147,13 @@ test("Able to delete post", async () => {
   expect(content).not.toContain(blogToDelete.content)
 })
 
+test("Returns 401 when token not provided", async () => {
+  await api
+    .post("/api/blogs")
+    .send(initialBlogs[2])
+    .expect(401)
+})
+
 test("Able to update post", async () => {
   const responseAtStart = await api.get("/api/blogs");
   let blogToUpdate = responseAtStart.body[0];
