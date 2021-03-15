@@ -6,6 +6,8 @@ const initialBlogs = require("./test_helper");
 
 const api = supertest(app);
 
+let token;
+
 beforeAll(async () => {
   let newUser = {
     username: "testuser",
@@ -24,15 +26,21 @@ await api
   let loginResponse = await api
                 .post("/api/login")
                 .send(loginDetails)
-  let token = loginResponse.body.token;
+  token = loginResponse.body.token;
 })
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  let blogObject = new Blog(initialBlogs[0]);
-  await blogObject.save();
-  blogObject = new Blog(initialBlogs[1]);
-  await blogObject.save(0);
+  let blogObject = initialBlogs[0];
+  await api
+  .post("/api/blogs")
+  .set('Authorization', "bearer " + token)
+  .send(blogObject)
+  blogObject = initialBlogs[1];
+  await api
+  .post("/api/blogs")
+  .set('Authorization', "bearer " + token)
+  .send(blogObject)
 });
 
 test("Blogs are returned as JSON", async () => {
@@ -57,6 +65,7 @@ test("POST request to /api/blogs returns 201 status as well as content type appl
   let newBlog = initialBlogs[4];
   await api
     .post("/api/blogs")
+    .set('Authorization', "bearer " + token)
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
@@ -67,7 +76,10 @@ test("Total number of blogs increase by 1 after POST request to /api/blogs", asy
   let initialNumBlogs = response.body.length;
 
   let newBlog = initialBlogs[5];
-  await api.post("/api/blogs").send(newBlog);
+  await api
+    .post("/api/blogs")
+    .set('Authorization', "bearer " + token)
+    .send(newBlog);
 
   response = await api.get("/api/blogs");
 
@@ -76,7 +88,7 @@ test("Total number of blogs increase by 1 after POST request to /api/blogs", asy
 
 test("Blog content saved after POST request is correct", async () => {
   let newBlog = initialBlogs[5];
-  await api.post("/api/blogs").send(newBlog);
+  await api.post("/api/blogs").set('Authorization', "bearer " + token).send(newBlog);
   let response = await api.get("/api/blogs");
 
   expect(response.body[response.body.length - 1].title).toBe("Type wars");
@@ -89,7 +101,7 @@ test("If likes property missing from request, likes will default to 0", async ()
     url: "https://github.com/getify/You-Dont-Know-JS"
   }
 
-  let response = await api.post("/api/blogs").send(newBlog);
+  let response = await api.post("/api/blogs").set('Authorization', "bearer " + token).send(newBlog);
   expect(response.body.likes).toBe(0);
 })
 
@@ -101,6 +113,7 @@ test("If title missing from request, will respond with status code 400", async (
   }
   await api
     .post("/api/blogs")
+    .set('Authorization', "bearer " + token)
     .send(newBlog)
     .expect(400)
 })
@@ -113,6 +126,7 @@ test("If url missing from request, will respond with status code 400", async () 
   }
   await api
     .post("/api/blogs")
+    .set('Authorization', "bearer " + token)
     .send(newBlog)
     .expect(400)
 })
@@ -123,6 +137,7 @@ test("Able to delete post", async () => {
 
   await api
     .delete(`/api/blogs/${blogToDelete.id}`)
+    .set('Authorization', "bearer " + token)
     .expect(204)
 
   const responseAtEnd = await api.get("/api/blogs");
